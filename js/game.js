@@ -69,6 +69,11 @@ var Game = (function () {
      */
     function restart() {
         StateManager.resetState();
+        // 清理隐藏关卡传送门的 entered 状态类，避免重开后传送门变灰
+        var portal = document.getElementById("secret-portal");
+        if (portal) {
+            portal.classList.remove("entered");
+        }
         startGame(true);
     }
 
