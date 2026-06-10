@@ -42,6 +42,9 @@ var UI = (function () {
         if (bg) {
             bg.className = "";
             bg.classList.add(scene.cssClass);
+            if (scene.backgroundImage) {
+                bg.style.backgroundImage = "url('" + scene.backgroundImage + "')";
+            }
         }
 
         if (area) {
