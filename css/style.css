@@ -289,24 +289,32 @@ body {
 /* ========== 彩蛋笔记本 ========== */
 #hidden-notebook {
     position: absolute;
-    left: 18%;
+    right: 30%;
     top: 22%;
-    font-size: 56px;
+    font-size: 64px;
     cursor: pointer;
-    z-index: 12;
+    z-index: 15;
     user-select: none;
     transition: transform 0.2s;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 #hidden-notebook:hover {
     transform: scale(1.15) rotate(-5deg);
+    box-shadow: 0 0 28px rgba(77, 208, 225, 0.9), 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
 #hidden-notebook.found {
-    opacity: 0.35;
+    opacity: 0.5;
     pointer-events: none;
-    filter: grayscale(1);
+    filter: grayscale(0.6);
 }
 
 /* 笔记本彩蛋弹窗 */
