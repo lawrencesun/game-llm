@@ -50,6 +50,32 @@ var UI = (function () {
         if (area) {
             area.setAttribute("data-scene-label", scene.nameEn);
         }
+
+        refreshHiddenCat(scene);
+    }
+
+    /**
+     * 控制彩蛋猫咪的显示
+     * 仅在校门场景显示，并且如果已经获得物品则置灰
+     */
+    function refreshHiddenCat(scene) {
+        var cat = document.getElementById("hidden-cat");
+        if (!cat) return;
+
+        if (scene.id === "gate") {
+            cat.classList.remove("hidden");
+            var state = StateManager.getState();
+            var hasItem = state.inventory.some(function (i) {
+                return i.id === "lucky_cat_paw";
+            });
+            if (hasItem) {
+                cat.classList.add("found");
+            } else {
+                cat.classList.remove("found");
+            }
+        } else {
+            cat.classList.add("hidden");
+        }
     }
 
     /**

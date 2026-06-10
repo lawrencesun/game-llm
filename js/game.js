@@ -73,6 +73,73 @@ var Game = (function () {
     }
 
     /**
+     * 隐藏物品定义
+     * 点击场景中的彩蛋猫咪后获得
+     */
+    var CAT_HIDDEN_ITEM = {
+        id: "lucky_cat_paw",
+        name: "Lucky Cat Paw",
+        cnName: "幸运猫爪印",
+        icon: "\uD83D\uDC3E"
+    };
+
+    /**
+     * 处理点击彩蛋猫咪
+     */
+    function onCatClick() {
+        var state = StateManager.getState();
+        if (state.currentScene !== "gate") return;
+
+        var hasItem = state.inventory.some(function (i) {
+            return i.id === CAT_HIDDEN_ITEM.id;
+        });
+        if (hasItem) {
+            alert("You have already got the lucky cat paw. Keep exploring!");
+            return;
+        }
+
+        var popup = document.getElementById("cat-popup");
+        var textEl = document.getElementById("cat-popup-text");
+        var itemEl = document.getElementById("cat-popup-item");
+
+        if (textEl) {
+            textEl.textContent = "A hidden tabby cat is sunbathing in the school gate. Everyone calls it \"Senior\". It rubs against your leg and drops a small glowing paw print. It seems to bring good luck on your campus adventure!";
+        }
+        if (itemEl) {
+            itemEl.innerHTML = '<span class="item-icon">' + CAT_HIDDEN_ITEM.icon + '</span>' + CAT_HIDDEN_ITEM.cnName;
+        }
+        if (popup) {
+            popup.classList.remove("hidden");
+        }
+    }
+
+    /**
+     * 关闭猫咪彩蛋弹窗
+     * 同时发放物品
+     */
+    function closeCatPopup() {
+        StateManager.addInventoryItem({
+            id: CAT_HIDDEN_ITEM.id,
+            name: CAT_HIDDEN_ITEM.cnName,
+            icon: CAT_HIDDEN_ITEM.icon
+        });
+
+        var cat = document.getElementById("hidden-cat");
+        if (cat) {
+            cat.classList.add("found");
+        }
+
+        var popup = document.getElementById("cat-popup");
+        if (popup) {
+            popup.classList.add("hidden");
+        }
+
+        if (typeof UI !== "undefined" && UI.refreshAll) {
+            UI.refreshAll();
+        }
+    }
+
+    /**
      * 绑定事件处理器
      */
     function bindEvents() {
@@ -89,6 +156,20 @@ var Game = (function () {
                 if (!DialogueManager.isOpen()) {
                     DialogueManager.openDialogue();
                 }
+            });
+        }
+
+        var hiddenCat = document.getElementById("hidden-cat");
+        if (hiddenCat) {
+            hiddenCat.addEventListener("click", function () {
+                onCatClick();
+            });
+        }
+
+        var btnCatClose = document.getElementById("btn-cat-popup-close");
+        if (btnCatClose) {
+            btnCatClose.addEventListener("click", function () {
+                closeCatPopup();
             });
         }
 
@@ -139,6 +220,8 @@ var Game = (function () {
         goToScene: goToScene,
         showVictory: showVictory,
         restart: restart,
-        bindEvents: bindEvents
+        bindEvents: bindEvents,
+        onCatClick: onCatClick,
+        closeCatPopup: closeCatPopup
     };
 })();
