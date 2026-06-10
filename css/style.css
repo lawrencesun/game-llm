@@ -238,6 +238,80 @@ body {
     animation: popupIn 0.3s ease;
 }
 
+/* ========== 彩蛋咖啡 ========== */
+#hidden-coffee {
+    position: absolute;
+    left: 14%;
+    bottom: 22%;
+    font-size: 56px;
+    cursor: pointer;
+    z-index: 12;
+    user-select: none;
+    transition: transform 0.2s;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+#hidden-coffee:hover {
+    transform: scale(1.15) rotate(-5deg);
+}
+
+#hidden-coffee.found {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: grayscale(1);
+}
+
+/* 咖啡彩蛋弹窗 */
+#coffee-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+#coffee-popup-box {
+    background: linear-gradient(135deg, #3e2723, #1a1a2e);
+    border: 2px solid #ffb74d;
+    border-radius: 16px;
+    padding: 28px 32px;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(255, 183, 77, 0.3);
+    animation: popupIn 0.3s ease;
+}
+
+#coffee-popup-title {
+    font-size: 22px;
+    color: #ffb74d;
+    margin-bottom: 16px;
+    font-weight: bold;
+}
+
+#coffee-popup-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #e0e0e0;
+    margin-bottom: 16px;
+}
+
+#coffee-popup-item {
+    font-size: 18px;
+    color: #ffc107;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#coffee-popup-item .item-icon {
+    font-size: 36px;
+    margin-right: 8px;
+}
+
 @keyframes popupIn {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }

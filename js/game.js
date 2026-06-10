@@ -84,6 +84,17 @@ var Game = (function () {
     };
 
     /**
+     * 隐藏物品定义
+     * 点击场景中的彩蛋咖啡后获得
+     */
+    var COFFEE_HIDDEN_ITEM = {
+        id: "warm_reading_note",
+        name: "Warm Reading Note",
+        cnName: "温暖阅读便签",
+        icon: "\uD83D\uDCDC"
+    };
+
+    /**
      * 处理点击彩蛋猫咪
      */
     function onCatClick() {
@@ -140,6 +151,62 @@ var Game = (function () {
     }
 
     /**
+     * 处理点击彩蛋咖啡
+     */
+    function onCoffeeClick() {
+        var state = StateManager.getState();
+        if (state.currentScene !== "library") return;
+
+        var hasItem = state.inventory.some(function (i) {
+            return i.id === COFFEE_HIDDEN_ITEM.id;
+        });
+        if (hasItem) {
+            alert("你已经收下这杯咖啡的便签啦，继续探索吧！");
+            return;
+        }
+
+        var popup = document.getElementById("coffee-popup");
+        var textEl = document.getElementById("coffee-popup-text");
+        var itemEl = document.getElementById("coffee-popup-item");
+
+        if (textEl) {
+            textEl.textContent = '自习桌的角落，安静地放着一杯还冒着热气的拿铁。杯套下面压着一张便签："学习辛苦啦，这张便签留给你当书签吧——每一页新知，都值得被温柔对待。"';
+        }
+        if (itemEl) {
+            itemEl.innerHTML = '<span class="item-icon">' + COFFEE_HIDDEN_ITEM.icon + '</span>' + COFFEE_HIDDEN_ITEM.cnName;
+        }
+        if (popup) {
+            popup.classList.remove("hidden");
+        }
+    }
+
+    /**
+     * 关闭咖啡彩蛋弹窗
+     * 同时发放物品
+     */
+    function closeCoffeePopup() {
+        StateManager.addInventoryItem({
+            id: COFFEE_HIDDEN_ITEM.id,
+            name: COFFEE_HIDDEN_ITEM.cnName,
+            icon: COFFEE_HIDDEN_ITEM.icon
+        });
+
+        var coffee = document.getElementById("hidden-coffee");
+        if (coffee) {
+            coffee.classList.add("found");
+        }
+
+        var popup = document.getElementById("coffee-popup");
+        if (popup) {
+            popup.classList.add("hidden");
+        }
+
+        if (typeof UI !== "undefined" && UI.refreshAll) {
+            UI.refreshAll();
+        }
+    }
+
+    /**
      * 绑定事件处理器
      */
     function bindEvents() {
@@ -170,6 +237,20 @@ var Game = (function () {
         if (btnCatClose) {
             btnCatClose.addEventListener("click", function () {
                 closeCatPopup();
+            });
+        }
+
+        var hiddenCoffee = document.getElementById("hidden-coffee");
+        if (hiddenCoffee) {
+            hiddenCoffee.addEventListener("click", function () {
+                onCoffeeClick();
+            });
+        }
+
+        var btnCoffeeClose = document.getElementById("btn-coffee-popup-close");
+        if (btnCoffeeClose) {
+            btnCoffeeClose.addEventListener("click", function () {
+                closeCoffeePopup();
             });
         }
 
@@ -222,6 +303,8 @@ var Game = (function () {
         restart: restart,
         bindEvents: bindEvents,
         onCatClick: onCatClick,
-        closeCatPopup: closeCatPopup
+        closeCatPopup: closeCatPopup,
+        onCoffeeClick: onCoffeeClick,
+        closeCoffeePopup: closeCoffeePopup
     };
 })();

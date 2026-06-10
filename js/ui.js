@@ -52,6 +52,7 @@ var UI = (function () {
         }
 
         refreshHiddenCat(scene);
+        refreshHiddenCoffee(scene);
     }
 
     /**
@@ -75,6 +76,30 @@ var UI = (function () {
             }
         } else {
             cat.classList.add("hidden");
+        }
+    }
+
+    /**
+     * 控制彩蛋咖啡的显示
+     * 仅在图书馆场景显示，并且如果已经获得物品则置灰
+     */
+    function refreshHiddenCoffee(scene) {
+        var coffee = document.getElementById("hidden-coffee");
+        if (!coffee) return;
+
+        if (scene.id === "library") {
+            coffee.classList.remove("hidden");
+            var state = StateManager.getState();
+            var hasItem = state.inventory.some(function (i) {
+                return i.id === "warm_reading_note";
+            });
+            if (hasItem) {
+                coffee.classList.add("found");
+            } else {
+                coffee.classList.remove("found");
+            }
+        } else {
+            coffee.classList.add("hidden");
         }
     }
 
