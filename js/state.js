@@ -26,7 +26,8 @@ const StateManager = (function () {
             },
             badges: [],
             inventory: [],
-            gameFinished: false
+            gameFinished: false,
+            secretRoomCompleted: false
         };
     }
 
@@ -44,13 +45,21 @@ const StateManager = (function () {
 
     /**
      * 从 localStorage 读取游戏状态
+     * 自动补全缺失字段，兼容旧存档
      * 如果不存在则返回初始状态
      */
     function loadState() {
         try {
             var json = localStorage.getItem(STORAGE_KEY);
             if (json) {
-                return JSON.parse(json);
+                var saved = JSON.parse(json);
+                var initial = createInitialState();
+                for (var key in initial) {
+                    if (initial.hasOwnProperty(key) && !saved.hasOwnProperty(key)) {
+                        saved[key] = initial[key];
+                    }
+                }
+                return saved;
             }
         } catch (e) {
             console.error("读取游戏状态失败:", e);
@@ -142,6 +151,42 @@ const StateManager = (function () {
     }
 
     /**
+     * 标记隐藏关卡已完成
+     */
+    function completeSecretRoom() {
+        var state = loadState();
+        state.secretRoomCompleted = true;
+        saveState(state);
+        return state;
+    }
+
+    /**
+     * 检查是否集齐了三个隐藏物品
+     */
+    function hasAllHiddenItems() {
+        var state = loadState();
+        var requiredIds = ["lucky_cat_paw", "warm_reading_note", "researcher_notebook"];
+        return requiredIds.every(function (id) {
+            return state.inventory.some(function (i) {
+                return i.id === id;
+            });
+        });
+    }
+
+    /**
+     * 检查是否可以进入隐藏关卡
+     * 条件：三个主关卡全部完成 + 三个隐藏物品全部集齐 + 未完成过
+     */
+    function canEnterSecretRoom() {
+        var state = loadState();
+        if (state.secretRoomCompleted) return false;
+        var allScenesDone = state.completedScenes.gate
+            && state.completedScenes.library
+            && state.completedScenes.aiInstitute;
+        return allScenesDone && hasAllHiddenItems();
+    }
+
+    /**
      * 获取当前状态
      */
     function getState() {
@@ -176,6 +221,9 @@ const StateManager = (function () {
         addInventoryItem: addInventoryItem,
         addBadge: addBadge,
         setGameFinished: setGameFinished,
+        completeSecretRoom: completeSecretRoom,
+        hasAllHiddenItems: hasAllHiddenItems,
+        canEnterSecretRoom: canEnterSecretRoom,
         getState: getState,
         isSceneUnlocked: isSceneUnlocked,
         isSceneCompleted: isSceneCompleted

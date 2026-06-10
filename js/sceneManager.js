@@ -165,9 +165,18 @@ var SceneManager = (function () {
 
         var nextScene = unlockNextScene(sceneId);
 
+        // 是否立刻游戏通关：仅当没有下一关
+        // 且玩家无法进入隐藏关卡时才标记为已通关
         var isGameFinished = scene.unlockNext === null;
         if (isGameFinished) {
-            StateManager.setGameFinished();
+            var canEnterSecret = typeof StateManager !== "undefined"
+                && typeof StateManager.canEnterSecretRoom === "function"
+                && StateManager.canEnterSecretRoom();
+            if (canEnterSecret) {
+                isGameFinished = false;
+            } else {
+                StateManager.setGameFinished();
+            }
         }
 
         return {

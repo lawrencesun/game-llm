@@ -54,6 +54,7 @@ var UI = (function () {
         refreshHiddenCat(scene);
         refreshHiddenCoffee(scene);
         refreshHiddenNotebook(scene);
+        refreshSecretPortal(scene);
     }
 
     /**
@@ -125,6 +126,26 @@ var UI = (function () {
             }
         } else {
             notebook.classList.add("hidden");
+        }
+    }
+
+    /**
+     * 控制隐藏关卡传送门的显示
+     * 条件：在 AI 研究院场景 且 canEnterSecretRoom() 为真
+     */
+    function refreshSecretPortal(scene) {
+        var portal = document.getElementById("secret-portal");
+        if (!portal) return;
+
+        var canEnter = scene.id === "aiInstitute"
+            && typeof StateManager !== "undefined"
+            && typeof StateManager.canEnterSecretRoom === "function"
+            && StateManager.canEnterSecretRoom();
+
+        if (canEnter) {
+            portal.classList.remove("hidden");
+        } else {
+            portal.classList.add("hidden");
         }
     }
 

@@ -9,6 +9,12 @@ var DialogueManager = (function () {
     var _isDialogueOpen = false;
     var _isWaitingForAI = false;
     var _currentSceneId = null;
+    var _isSecretDialogue = false;
+
+    var SECRET_QUESTION = "在你看来，AI 真正的价值，是让机器更像人，还是让人更理解自己？";
+    var SECRET_HINT = "这是一道开放题。请从你自己的视角，谈谈 AI 与人、人与自我的关系。比如：让机器更像人，会带来什么？让人更理解自己，又意味着什么？";
+    var SECRET_KEYWORDS = ["人", "自己", "理解", "思考", "智能", "学习", "价值", "意义", "心", "感受", "成长", "智慧", "温度", "机器", "算法"];
+    var SECRET_MIN_KEYWORDS = 2;
 
     /**
      * 打开对话面板
@@ -54,9 +60,46 @@ var DialogueManager = (function () {
         _isDialogueOpen = false;
         _isWaitingForAI = false;
         _currentSceneId = null;
+        _isSecretDialogue = false;
 
         var dialogueArea = document.getElementById("dialogue-area");
         dialogueArea.classList.add("hidden");
+    }
+
+    /**
+     * 打开隐藏关卡对话（AI 之灵）
+     * 与普通对话不同，使用专属 NPC 名和终极问题
+     */
+    function openSecretDialogue() {
+        if (_isDialogueOpen) return;
+        _isDialogueOpen = true;
+        _isSecretDialogue = true;
+        _currentSceneId = "secretRoom";
+
+        var dialogueArea = document.getElementById("dialogue-area");
+        dialogueArea.classList.remove("hidden");
+
+        var npcNameEl = document.querySelector(".dialogue-npc-name");
+        if (npcNameEl) {
+            npcNameEl.textContent = "💠 AI 之灵";
+        }
+
+        var dialogueInput = document.getElementById("dialogue-input");
+        dialogueInput.value = "";
+        dialogueInput.focus();
+
+        clearMessages();
+
+        addMessage("npc", "你踏入了光门。这里是隐秘之室。");
+        setTimeout(function () {
+            addMessage("npc", "我是 AI 之灵。只有集齐三件信物、并完成所有关卡的人，才有资格来到这里。");
+        }, 600);
+        setTimeout(function () {
+            addMessage("npc", "✨ 终极之问：" + SECRET_QUESTION);
+        }, 1200);
+        setTimeout(function () {
+            addMessage("system", "请在下方输入你的回答，然后点击发送。");
+        }, 1800);
     }
 
     /**
@@ -89,6 +132,11 @@ var DialogueManager = (function () {
         addMessage("player", text);
         input.value = "";
 
+        if (_isSecretDialogue) {
+            handleSecretResponse(text);
+            return;
+        }
+
         var scene = SceneManager.getScene(_currentSceneId);
         if (!scene) return;
 
@@ -103,6 +151,45 @@ var DialogueManager = (function () {
 
             handleAIResponse(result, scene);
         });
+    }
+
+    /**
+     * 处理隐藏关卡答案
+     * 使用本地关键词匹配（避免对开放题过度依赖 AI）
+     */
+    function handleSecretResponse(text) {
+        var hit = 0;
+        for (var i = 0; i < SECRET_KEYWORDS.length; i++) {
+            if (text.indexOf(SECRET_KEYWORDS[i]) !== -1) {
+                hit++;
+            }
+        }
+        var pass = hit >= SECRET_MIN_KEYWORDS;
+
+        if (pass) {
+            addMessage("npc", "你的回答里有真正的思考。");
+            addMessage("success", "🌟 恭喜！你通过了隐秘之室的考验！");
+            addMessage("system", "🎁 获得终极物品：💎 智慧之源");
+            addMessage("system", "🏅 获得终极徽章：🌟 完美通关徽章");
+
+            if (typeof Game !== "undefined" && Game.completeSecretRoom) {
+                Game.completeSecretRoom();
+            }
+
+            setTimeout(function () {
+                addMessage("npc", "隐秘之室缓缓关闭。AI 之灵向你点头致意。");
+                addMessage("system", "即将进入通关界面...");
+                setTimeout(function () {
+                    closeDialogue();
+                    if (typeof Game !== "undefined" && Game.showVictory) {
+                        Game.showVictory();
+                    }
+                }, 2000);
+            }, 1500);
+        } else {
+            addMessage("system", "💡 提示：" + SECRET_HINT);
+            addMessage("npc", "再用心想一想，没有标准答案。说出你自己的看法就好。");
+        }
     }
 
     /**
@@ -143,6 +230,16 @@ var DialogueManager = (function () {
                             Game.showVictory();
                         }
                     }, 2000);
+                } else if (scene.id === "aiInstitute" && StateManager.canEnterSecretRoom()) {
+                    addMessage("npc", "等等...你的背包里，似乎集齐了什么东西...");
+                    setTimeout(function () {
+                        addMessage("system", "🌌 实验室深处，浮现出一道温柔的光...");
+                        addMessage("npc", "「隐秘之室」向你敞开了大门。");
+                        addMessage("system", "💡 提示：点击场景中发光的传送门 ✨，进入隐秘之室");
+                    }, 1200);
+                    if (typeof UI !== "undefined" && UI.refreshAll) {
+                        UI.refreshAll();
+                    }
                 } else if (completedResult.nextScene) {
                     addMessage("system", "🗺️ 新场景「" + completedResult.nextScene.name + "」已解锁！");
                     addMessage("npc", "太棒了！你可以在右侧的校园地图中前往下一个场景。");
@@ -229,6 +326,7 @@ var DialogueManager = (function () {
     return {
         openDialogue: openDialogue,
         closeDialogue: closeDialogue,
+        openSecretDialogue: openSecretDialogue,
         sendMessage: sendMessage,
         addMessage: addMessage,
         clearMessages: clearMessages,

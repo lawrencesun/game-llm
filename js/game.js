@@ -106,6 +106,24 @@ var Game = (function () {
     };
 
     /**
+     * 隐藏关卡终极奖励
+     * 集齐三个隐藏物品后，进入隐秘之室完成终极问题获得
+     */
+    var SECRET_REWARD_ITEM = {
+        id: "wisdom_source",
+        name: "Wisdom Source",
+        cnName: "智慧之源",
+        icon: "\uD83D\uDC8E"
+    };
+
+    var SECRET_REWARD_BADGE = {
+        id: "perfect_badge",
+        name: "Perfect Clear Badge",
+        cnName: "完美通关徽章",
+        icon: "\uD83C\uDF1F"
+    };
+
+    /**
      * 处理点击彩蛋猫咪
      */
     function onCatClick() {
@@ -274,6 +292,43 @@ var Game = (function () {
     }
 
     /**
+     * 处理点击隐藏关卡传送门
+     * 委托给 DialogueManager.openSecretDialogue
+     */
+    function onSecretPortalClick() {
+        if (DialogueManager.isOpen()) return;
+        if (typeof DialogueManager.openSecretDialogue === "function") {
+            DialogueManager.openSecretDialogue();
+        }
+    }
+
+    /**
+     * 完成隐藏关卡，发放终极奖励
+     */
+    function completeSecretRoom() {
+        StateManager.addInventoryItem({
+            id: SECRET_REWARD_ITEM.id,
+            name: SECRET_REWARD_ITEM.cnName,
+            icon: SECRET_REWARD_ITEM.icon
+        });
+        StateManager.addBadge({
+            id: SECRET_REWARD_BADGE.id,
+            name: SECRET_REWARD_BADGE.cnName,
+            icon: SECRET_REWARD_BADGE.icon
+        });
+        StateManager.completeSecretRoom();
+
+        var portal = document.getElementById("secret-portal");
+        if (portal) {
+            portal.classList.add("entered");
+        }
+
+        if (typeof UI !== "undefined" && UI.refreshAll) {
+            UI.refreshAll();
+        }
+    }
+
+    /**
      * 绑定事件处理器
      */
     function bindEvents() {
@@ -335,6 +390,13 @@ var Game = (function () {
             });
         }
 
+        var secretPortal = document.getElementById("secret-portal");
+        if (secretPortal) {
+            secretPortal.addEventListener("click", function () {
+                onSecretPortalClick();
+            });
+        }
+
         var btnCloseDialogue = document.getElementById("btn-close-dialogue");
         if (btnCloseDialogue) {
             btnCloseDialogue.addEventListener("click", function () {
@@ -388,6 +450,8 @@ var Game = (function () {
         onCoffeeClick: onCoffeeClick,
         closeCoffeePopup: closeCoffeePopup,
         onNotebookClick: onNotebookClick,
-        closeNotebookPopup: closeNotebookPopup
+        closeNotebookPopup: closeNotebookPopup,
+        onSecretPortalClick: onSecretPortalClick,
+        completeSecretRoom: completeSecretRoom
     };
 })();
