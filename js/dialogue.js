@@ -11,10 +11,9 @@ var DialogueManager = (function () {
     var _currentSceneId = null;
     var _isSecretDialogue = false;
 
-    var SECRET_QUESTION = "在你看来，AI 真正的价值，是让机器更像人，还是让人更理解自己？";
-    var SECRET_HINT = "这是一道开放题。请从你自己的视角，谈谈 AI 与人、人与自我的关系。比如：让机器更像人，会带来什么？让人更理解自己，又意味着什么？";
-    var SECRET_KEYWORDS = ["人", "自己", "理解", "思考", "智能", "学习", "价值", "意义", "心", "感受", "成长", "智慧", "温度", "机器", "算法"];
-    var SECRET_MIN_KEYWORDS = 2;
+    var SECRET_QUESTION = "生命,宇宙以及一切事物的答案是（The answer to the question of Life, the Universe and Everything is）...";
+    var SECRET_HINT = "翻开《银河系漫游指南》找找线索吧——超级计算机 Deep Thought 用了 750 万年才算出那个答案，一个看似平凡却藏着宇宙终极奥秘的数字。";
+    var SECRET_ANSWER = "42";
 
     /**
      * 打开对话面板
@@ -155,19 +154,14 @@ var DialogueManager = (function () {
 
     /**
      * 处理隐藏关卡答案
-     * 使用本地关键词匹配（避免对开放题过度依赖 AI）
+     * 答案校验：42（接受阿拉伯数字或中文数字写法）
      */
     function handleSecretResponse(text) {
-        var hit = 0;
-        for (var i = 0; i < SECRET_KEYWORDS.length; i++) {
-            if (text.indexOf(SECRET_KEYWORDS[i]) !== -1) {
-                hit++;
-            }
-        }
-        var pass = hit >= SECRET_MIN_KEYWORDS;
+        var pass = checkSecretAnswer(text);
 
         if (pass) {
-            addMessage("npc", "你的回答里有真正的思考。");
+            addMessage("npc", "是的。42——一个看似平凡、却藏着宇宙终极奥秘的数字。");
+            addMessage("npc", "Deep Thought 在 750 万年前便给出了答案。只是问题本身，至今没有人真正想清楚。");
             addMessage("success", "🌟 恭喜！你通过了隐秘之室的考验！");
             addMessage("system", "🎁 获得终极物品：💎 智慧之源");
             addMessage("system", "🏅 获得终极徽章：🌟 完美通关徽章");
@@ -188,8 +182,22 @@ var DialogueManager = (function () {
             }, 1500);
         } else {
             addMessage("system", "💡 提示：" + SECRET_HINT);
-            addMessage("npc", "再用心想一想，没有标准答案。说出你自己的看法就好。");
+            addMessage("npc", "再想想——也许答案就藏在你读过的那本书里。");
         }
+    }
+
+    /**
+     * 校验终极问题答案
+     * 接受 "42" / "四十二" / "forty two" / "forty-two" 等写法
+     */
+    function checkSecretAnswer(text) {
+        if (!text) return false;
+        var normalized = text.replace(/\s+/g, "").toLowerCase();
+        if (normalized.indexOf("42") !== -1) return true;
+        if (normalized.indexOf("四十二") !== -1) return true;
+        if (normalized.indexOf("肆拾贰") !== -1) return true;
+        if (/forty[\s-]*two/.test(normalized)) return true;
+        return false;
     }
 
     /**
