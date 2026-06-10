@@ -103,7 +103,7 @@ var Game = (function () {
         var itemEl = document.getElementById("cat-popup-item");
 
         if (textEl) {
-            textEl.textContent = "A hidden tabby cat is sunbathing in the school gate. Everyone calls it \"Senior\". It rubs against your leg and drops a small glowing paw print. It seems to bring good luck on your campus adventure!";
+            textEl.textContent = '校门口的花坛边，趴着一只晒太阳的小橘猫。大家都叫它"学长"。它蹭了蹭你的裤脚，掉下一枚发着微光的猫爪印——听说带着它去探险，会特别幸运哦！';
         }
         if (itemEl) {
             itemEl.innerHTML = '<span class="item-icon">' + CAT_HIDDEN_ITEM.icon + '</span>' + CAT_HIDDEN_ITEM.cnName;
