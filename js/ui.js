@@ -53,6 +53,7 @@ var UI = (function () {
 
         refreshHiddenCat(scene);
         refreshHiddenCoffee(scene);
+        refreshHiddenNotebook(scene);
     }
 
     /**
@@ -100,6 +101,30 @@ var UI = (function () {
             }
         } else {
             coffee.classList.add("hidden");
+        }
+    }
+
+    /**
+     * 控制彩蛋笔记本的显示
+     * 仅在AI研究院场景显示，并且如果已经获得物品则置灰
+     */
+    function refreshHiddenNotebook(scene) {
+        var notebook = document.getElementById("hidden-notebook");
+        if (!notebook) return;
+
+        if (scene.id === "aiInstitute") {
+            notebook.classList.remove("hidden");
+            var state = StateManager.getState();
+            var hasItem = state.inventory.some(function (i) {
+                return i.id === "researcher_notebook";
+            });
+            if (hasItem) {
+                notebook.classList.add("found");
+            } else {
+                notebook.classList.remove("found");
+            }
+        } else {
+            notebook.classList.add("hidden");
         }
     }
 

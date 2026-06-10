@@ -95,6 +95,17 @@ var Game = (function () {
     };
 
     /**
+     * 隐藏物品定义
+     * 点击场景中的彩蛋笔记本后获得
+     */
+    var NOTEBOOK_HIDDEN_ITEM = {
+        id: "researcher_notebook",
+        name: "Researcher Notebook",
+        cnName: "研究员手稿",
+        icon: "\uD83D\uDCD3"
+    };
+
+    /**
      * 处理点击彩蛋猫咪
      */
     function onCatClick() {
@@ -207,6 +218,62 @@ var Game = (function () {
     }
 
     /**
+     * 处理点击彩蛋笔记本
+     */
+    function onNotebookClick() {
+        var state = StateManager.getState();
+        if (state.currentScene !== "aiInstitute") return;
+
+        var hasItem = state.inventory.some(function (i) {
+            return i.id === NOTEBOOK_HIDDEN_ITEM.id;
+        });
+        if (hasItem) {
+            alert("你已收下这本研究员手稿，继续你的AI探索之旅吧！");
+            return;
+        }
+
+        var popup = document.getElementById("notebook-popup");
+        var textEl = document.getElementById("notebook-popup-text");
+        var itemEl = document.getElementById("notebook-popup-item");
+
+        if (textEl) {
+            textEl.textContent = '实验台角落压着一本摊开的手稿，字迹有些潦草。扉页写着："真正的智能，不只是算法跑得更快，而是让机器学会理解人的温度。这本笔记留给你——愿你走得更远。"';
+        }
+        if (itemEl) {
+            itemEl.innerHTML = '<span class="item-icon">' + NOTEBOOK_HIDDEN_ITEM.icon + '</span>' + NOTEBOOK_HIDDEN_ITEM.cnName;
+        }
+        if (popup) {
+            popup.classList.remove("hidden");
+        }
+    }
+
+    /**
+     * 关闭笔记本彩蛋弹窗
+     * 同时发放物品
+     */
+    function closeNotebookPopup() {
+        StateManager.addInventoryItem({
+            id: NOTEBOOK_HIDDEN_ITEM.id,
+            name: NOTEBOOK_HIDDEN_ITEM.cnName,
+            icon: NOTEBOOK_HIDDEN_ITEM.icon
+        });
+
+        var notebook = document.getElementById("hidden-notebook");
+        if (notebook) {
+            notebook.classList.add("found");
+        }
+
+        var popup = document.getElementById("notebook-popup");
+        if (popup) {
+            popup.classList.add("hidden");
+        }
+
+        if (typeof UI !== "undefined" && UI.refreshAll) {
+            UI.refreshAll();
+        }
+    }
+
+    /**
      * 绑定事件处理器
      */
     function bindEvents() {
@@ -251,6 +318,20 @@ var Game = (function () {
         if (btnCoffeeClose) {
             btnCoffeeClose.addEventListener("click", function () {
                 closeCoffeePopup();
+            });
+        }
+
+        var hiddenNotebook = document.getElementById("hidden-notebook");
+        if (hiddenNotebook) {
+            hiddenNotebook.addEventListener("click", function () {
+                onNotebookClick();
+            });
+        }
+
+        var btnNotebookClose = document.getElementById("btn-notebook-popup-close");
+        if (btnNotebookClose) {
+            btnNotebookClose.addEventListener("click", function () {
+                closeNotebookPopup();
             });
         }
 
@@ -305,6 +386,8 @@ var Game = (function () {
         onCatClick: onCatClick,
         closeCatPopup: closeCatPopup,
         onCoffeeClick: onCoffeeClick,
-        closeCoffeePopup: closeCoffeePopup
+        closeCoffeePopup: closeCoffeePopup,
+        onNotebookClick: onNotebookClick,
+        closeNotebookPopup: closeNotebookPopup
     };
 })();
